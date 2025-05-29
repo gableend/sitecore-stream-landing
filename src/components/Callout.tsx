@@ -170,7 +170,7 @@ ${content.enablingUseCases ? content.enablingUseCases.map(point => `• ${point}
         clearInterval(streamInterval);
         setIsStreaming(false);
       }
-    }, 12); // Changed from 25ms to 12ms (roughly 50% faster)
+    }, 8); // Changed from 12ms to 8ms (30% faster streaming)
   };
 
   const handleVoiceInput = () => {
@@ -452,7 +452,7 @@ ${type === 'article' ? 'In-depth analysis with visual frameworks and downloadabl
       }
     }, 100);
 
-    // Simulate streaming response (50% faster)
+    // Simulate streaming response (30% faster than previous)
     setStreamingContent("");
     let currentIndex = 0;
     const streamInterval = setInterval(() => {
@@ -463,7 +463,7 @@ ${type === 'article' ? 'In-depth analysis with visual frameworks and downloadabl
         clearInterval(streamInterval);
         setIsStreaming(false);
       }
-    }, 12); // Changed from 25ms to 12ms (roughly 50% faster)
+    }, 8); // Changed from 12ms to 8ms (30% faster streaming)
   };
 
   const getPlaceholderText = () => {
@@ -1088,9 +1088,56 @@ In-depth analysis with visual frameworks and downloadable resources
                           </svg>
                           Related Resources
                         </h3>
-                        {/* ... rest of the file unchanged ... */}
-                        {/* The rest of the file is unchanged and omitted for brevity */}
-                        {/* ... */}
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {/* AI and the future of CMS Video Card */}
+                          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                            <div className="aspect-video bg-gray-100 relative group">
+                              <video
+                                className="w-full h-full object-cover"
+                                poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 225'%3E%3Crect width='400' height='225' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-family='Arial, sans-serif' font-size='16' fill='%236b7280'%3EAI and the future of CMS%3C/text%3E%3C/svg%3E"
+                                controls
+                                preload="metadata"
+                              >
+                                <source src="https://webinars.sitecore.com/64968576/111460093/96f098177df90f545d9b87228c45b32c/video_hd/digital-visionaries-liz-nelson-7-video.mp4?referer=&uuid=968baaae-eff0-0acf-8f7c-db31a94fcc67" type="video/mp4" />
+                                Your browser does not support the video tag.
+                              </video>
+                              <div className="absolute inset-0 bg-purple-600 bg-opacity-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                  <path d="M8 5v14l11-7z"/>
+                                </svg>
+                              </div>
+                            </div>
+                            <div className="p-4">
+                              <h4 className="font-semibold text-gray-900 mb-2">AI and the future of CMS</h4>
+                              <p className="text-sm text-gray-600 mb-3">Explore how artificial intelligence is transforming content management systems and shaping the future of digital experiences.</p>
+                            </div>
+                          </div>
+
+                          {/* Navigating the AI revolution with Sitecore Video Card */}
+                          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                            <div className="aspect-video bg-gray-100 relative group">
+                              <video
+                                className="w-full h-full object-cover"
+                                poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 225'%3E%3Crect width='400' height='225' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-family='Arial, sans-serif' font-size='16' fill='%236b7280'%3ENavigating the AI revolution%3C/text%3E%3C/svg%3E"
+                                controls
+                                preload="metadata"
+                              >
+                                <source src="https://webinars.sitecore.com/64968568/111959869/9e19dc990e5c6c1aa207451a278c39bf/video_hd/navigating-the-ai-revolution-with-7-video.mp4?referer=&uuid=968baaae-eff0-0acf-8f7c-db31a94fcc67" type="video/mp4" />
+                                Your browser does not support the video tag.
+                              </video>
+                              <div className="absolute inset-0 bg-purple-600 bg-opacity-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                  <path d="M8 5v14l11-7z"/>
+                                </svg>
+                              </div>
+                            </div>
+                            <div className="p-4">
+                              <h4 className="font-semibold text-gray-900 mb-2">Navigating the AI revolution with Sitecore</h4>
+                              <p className="text-sm text-gray-600 mb-3">Learn how to successfully navigate the AI revolution and leverage Sitecore's capabilities for enhanced digital experiences.</p>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     )}
 
