@@ -8,7 +8,7 @@ export default function EventsSection() {
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 text-gray-900 leading-tight">
             Join the <span className="text-gradient">AI</span> conversation
           </h1>
-          <p className="text-xl md:text-2xl text-gray-600 max-w-5xl mx-auto leading-relaxed">
+          <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
             Register for upcoming events or revisit past discussions shaping the future of agentic experiences.
           </p>
         </div>

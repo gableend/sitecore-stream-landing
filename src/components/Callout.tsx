@@ -1,7 +1,7 @@
 "use client";
 
 import { Search, Mic, ArrowUp, CheckCircle, BookOpen, Lightbulb } from "lucide-react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 interface ModalContentData {
   title: string;
@@ -17,31 +17,46 @@ interface ModalContent {
 
 export default function Callout() {
   const [selectedRole, setSelectedRole] = useState("");
-  const [selectedBusinessModel, setSelectedBusinessModel] = useState("");
-  const [selectedAiKnowledge, setSelectedAiKnowledge] = useState("");
+  const [selectedIndustry, setSelectedIndustry] = useState("");
   const [currentQuery, setCurrentQuery] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamingContent, setStreamingContent] = useState("");
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [inputHeight, setInputHeight] = useState(46);
-  const suggestedQuestions: string[] = [
-    "What is personalization at AI scale?",
-    "How does content transformation work?",
-    "What is conversational UX?",
-    "What is the future of search?",
-    "How do generative ads work?",
-    "What are experience agents?",
-    "What will websites look like in 2030?"
+  const hotTopics: string[] = [
+    "Future of Search",
+    "Personalization at AI Scale",
+    "Generative Experiences"
   ];
   const [isVoiceActive, setIsVoiceActive] = useState(false);
   const [loadingContent, setLoadingContent] = useState<string | null>(null);
   const [showStreamActions, setShowStreamActions] = useState(false);
   const [inlineContent, setInlineContent] = useState<ModalContent | null>(null);
   const [activeContentLocation, setActiveContentLocation] = useState<string | null>(null);
+  const [conceptQueries, setConceptQueries] = useState<Array<{concept: string, response: string}>>([]);
+  const [conversationBubbles, setConversationBubbles] = useState<Array<{query: string, response: string}>>([]);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const streamActionsRef = useRef<HTMLDivElement>(null);
 
-  const allSelected = selectedRole && selectedBusinessModel && selectedAiKnowledge;
+  // Close stream actions dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (streamActionsRef.current && !streamActionsRef.current.contains(event.target as Node)) {
+        setShowStreamActions(false);
+      }
+    };
+
+    if (showStreamActions) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showStreamActions]);
+
+  const allSelected = selectedIndustry;
 
   const handleTopicClick = (question: string) => {
     setCurrentQuery(question);
@@ -71,13 +86,62 @@ export default function Callout() {
 
   const simulateStreaming = (question: string) => {
     setStreamingContent("");
-    const responses = [
-      `Based on your profile as ${selectedRole} in ${selectedBusinessModel} with ${selectedAiKnowledge.toLowerCase()} AI knowledge, here's what you need to know about "${question}":\n\nThis is a simulated streaming response that would contain relevant information tailored to your specific role and experience level. The content would be personalized based on your selections and provide actionable insights.\n\nKey considerations for your context:\n• Strategic implications for your role\n• Technical implementation details\n• Best practices and recommendations\n• Real-world examples and case studies`,
-      `Here's a deeper dive into "${question}" from your perspective:\n\nAs someone working in ${selectedBusinessModel.toLowerCase()} with ${selectedAiKnowledge.toLowerCase()} experience, you'll want to focus on practical applications that align with your current knowledge level.\n\nThis personalized response adapts to your learning style and provides content that matches your expertise level, ensuring you get the most relevant and actionable information.`,
-      `Let me explain "${question}" in the context of your work:\n\nGiven your role in ${selectedRole.toLowerCase()} within ${selectedBusinessModel.toLowerCase()}, this topic has specific relevance to your daily challenges and opportunities.\n\nThe response would include industry-specific examples, implementation strategies, and next steps tailored to your current AI knowledge level.`
-    ];
+    const getTopicResponse = (topic: string, industry: string) => {
+      const topicContent = {
+        "Future of Search": {
+          summary: `AI is revolutionizing search from keyword matching to understanding user intent and context. Modern search systems anticipate needs, personalize results, and deliver conversational experiences.`,
+          industryLens: `For the ${industry} industry, intelligent search transforms how customers discover products, access information, and interact with your digital ecosystem. This shift from transactional to conversational search creates new opportunities for engagement and conversion.`,
+          keyPoints: [
+            "Intent-based search algorithms",
+            "Conversational search interfaces",
+            "Predictive search suggestions",
+            "Context-aware result ranking"
+          ]
+        },
+        "Personalization at AI Scale": {
+          summary: `Scale personalization beyond basic demographics to real-time behavioral adaptation, creating unique experiences for every user interaction while maintaining privacy and performance.`,
+          industryLens: `In ${industry}, AI-scale personalization means delivering relevant content, products, and experiences to each customer automatically, driving engagement and business outcomes through intelligent automation.`,
+          keyPoints: [
+            "Real-time behavioral analysis",
+            "Dynamic content adaptation",
+            "Privacy-first personalization",
+            "Cross-channel consistency"
+          ]
+        },
+        "Generative Experiences": {
+          summary: `Move beyond static content to dynamic, AI-generated experiences that adapt in real-time based on user needs, preferences, and context, creating truly unique digital interactions.`,
+          industryLens: `For ${industry} organizations, generative experiences mean content, interfaces, and workflows that automatically adapt to each user's specific needs and context, improving efficiency and satisfaction.`,
+          keyPoints: [
+            "Dynamic content generation",
+            "Adaptive user interfaces",
+            "Contextual experience flows",
+            "Intelligent content optimization"
+          ]
+        }
+      };
 
-    const fullResponse = responses[Math.floor(Math.random() * responses.length)];
+      const content = topicContent[topic as keyof typeof topicContent];
+      if (!content) return "This topic is being developed. Please try one of the available topics.";
+
+      return `**${topic} - ${industry} Industry Perspective**
+
+${content.summary}
+
+**Industry-Specific Insights:**
+${content.industryLens}
+
+**Key Implementation Areas:**
+${content.keyPoints.map(point => `• ${point}`).join('\n')}
+
+**Next Steps:**
+This comprehensive approach to ${topic.toLowerCase()} in the ${industry} industry focuses on practical implementation strategies that align with your sector's unique requirements and opportunities.
+
+*This is placeholder content. The full system will include detailed articles, videos, podcasts, and interactive elements specific to your selected topic and industry.*`;
+    };
+
+    const response = getTopicResponse(question, selectedIndustry || 'Cross-industry');
+
+    const fullResponse = response;
 
     let currentIndex = 0;
     const streamInterval = setInterval(() => {
@@ -88,7 +152,7 @@ export default function Callout() {
         clearInterval(streamInterval);
         setIsStreaming(false);
       }
-    }, 25);
+    }, 12); // Changed from 25ms to 12ms (roughly 50% faster)
   };
 
   const handleVoiceInput = () => {
@@ -115,25 +179,53 @@ export default function Callout() {
     setInlineContent({ type: newType, data: mockContent });
     setActiveContentLocation('default');
     setIsContentExpanded(false); // Reset expansion state when switching types
+    setShowFullArticle(false); // Reset article expansion state when switching types
   };
 
-  const generateMockContent = (type: string, id: string) => {
+  const generateMockContent = (type: string, topic: string) => {
+    const topicTitles = {
+      "Future of Search": {
+        article: "The Evolution of Search: From Keywords to Conversations",
+        video: "Building Intelligent Search Systems",
+        podcast: "Search Strategy Roundtable: AI-First Approaches"
+      },
+      "Personalization at AI Scale": {
+        article: "Scaling Personalization: Beyond Demographics to Behavior",
+        video: "Real-time Personalization in Action",
+        podcast: "Privacy-First Personalization at Scale"
+      },
+      "Generative Experiences": {
+        article: "Creating Dynamic Digital Experiences with AI",
+        video: "Generative UX: Adaptive Interfaces Demo",
+        podcast: "The Future of Digital Experience Design"
+      }
+    };
+
+    const currentTopic = topic || currentQuery || "Future of Search";
+    const titles = topicTitles[currentTopic as keyof typeof topicTitles] || topicTitles["Future of Search"];
+
     const baseContent = {
-      title: `${type === 'article' ? 'The Future of AI Personalization' :
-               type === 'video' ? 'AI in Action: Real-time Content Adaptation' :
-               'Digital Transformation Podcast: AI Strategies'}`,
-      description: `Tailored for ${selectedRole} professionals in ${selectedBusinessModel} environments`,
-      duration: type === 'video' ? '12:34' : type === 'podcast' ? '28:45' : '8 min read',
-      content: `This ${type} explores how AI is transforming ${selectedBusinessModel?.toLowerCase()} experiences, with specific insights for ${selectedRole} teams at the ${selectedAiKnowledge.toLowerCase()} level.
+      title: titles[type as keyof typeof titles] || `${currentTopic} ${type.charAt(0).toUpperCase() + type.slice(1)}`,
+      description: `Comprehensive coverage of ${currentTopic.toLowerCase()}`,
+      duration: type === 'video' ? '15:42' : type === 'podcast' ? '32:18' : '12 min read',
+      content: `This ${type} provides comprehensive coverage of ${currentTopic.toLowerCase()}.
 
-Key takeaways include:
-• Implementation strategies specific to your role
-• Best practices for ${selectedBusinessModel?.toLowerCase()} environments
-• Technical considerations for ${selectedAiKnowledge.toLowerCase()} teams
+**What You'll Learn:**
+• Technology foundations and implementation strategies
+• Industry use cases and applications
+• Best practices and methodologies
 • Real-world examples and case studies
-• Next steps for getting started
+• Step-by-step implementation roadmap
 
-The content has been personalized based on your selections and provides actionable insights you can implement immediately.`
+**Key Insights:**
+This content addresses the core concepts and practical applications, providing actionable strategies you can implement.
+
+**Format-Specific Value:**
+${type === 'article' ? 'In-depth analysis with visual frameworks and downloadable resources' :
+  type === 'video' ? 'Live demonstrations, expert interviews, and practical tutorials' :
+  'Executive roundtable discussions with industry leaders and Q&A sessions'}
+
+*This is placeholder content demonstrating the structured approach to topic-specific materials.*`
     };
 
     return baseContent;
@@ -146,20 +238,62 @@ The content has been personalized based on your selections and provides actionab
   };
 
   const [isContentExpanded, setIsContentExpanded] = useState(false);
+  const [showFullArticle, setShowFullArticle] = useState(false);
+
+  const handleKeyConcept = (concept: string) => {
+    const conceptSummaries = {
+      'Machine Learning': 'Machine Learning enables systems to automatically learn and improve from experience without being explicitly programmed. In the context of AI-powered experiences, ML algorithms analyze user behavior patterns, preferences, and interactions to predict needs and personalize content in real-time.',
+      'Real-time Processing': 'Real-time processing allows systems to handle and respond to data as it arrives, enabling immediate personalization and dynamic content delivery. This capability is essential for creating responsive, adaptive digital experiences that feel natural and intuitive to users.',
+      'User Intent': 'User Intent refers to understanding what users are actually trying to accomplish, going beyond surface-level interactions to grasp underlying goals and motivations. AI systems analyze context, behavior patterns, and implicit signals to better serve user needs.',
+      'Dynamic Content': 'Dynamic Content automatically adapts and changes based on user context, preferences, and real-time conditions. This includes personalized messaging, adaptive interfaces, and content that evolves to match user journey stages and individual characteristics.',
+      'Digital Innovation': `Digital Innovation in the ${selectedIndustry || 'industry'} context involves leveraging emerging technologies to create new value propositions, improve operational efficiency, and enhance customer experiences. This includes AI-driven automation, intelligent workflows, and data-powered decision making.`,
+      'Competitive Advantage': `Competitive Advantage through AI technologies enables ${selectedIndustry || 'organizations'} to differentiate themselves through superior customer experiences, operational efficiency, and innovative service delivery. This strategic use of AI creates sustainable market positioning and customer loyalty.`
+    };
+
+    const summary = conceptSummaries[concept as keyof typeof conceptSummaries] || `${concept} is a key concept in modern AI-powered digital experiences, enabling more sophisticated and effective user interactions.`;
+
+    // Add the concept as a conversation bubble
+    setConversationBubbles(prev => [...prev, {
+      query: `What is ${concept}?`,
+      response: summary
+    }]);
+
+    // Scroll to the concept deep dive section after a brief delay
+    setTimeout(() => {
+      const conceptSection = document.querySelector('[data-concept-deep-dive]');
+      if (conceptSection) {
+        const elementTop = conceptSection.getBoundingClientRect().top + window.pageYOffset;
+        const offsetTop = elementTop - 100; // Show some context above
+        window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+      }
+    }, 100);
+  };
 
   const handleStreamAction = (action: string) => {
     setIsStreaming(true);
+    setShowStreamActions(false); // Hide dropdown immediately
+
     // Simulate different AI actions
     const actionResponses: { [key: string]: string } = {
-      summarize: `Here's a concise summary tailored for ${selectedRole} professionals:\n\nKey takeaways:\n• AI personalization increases engagement by 300%\n• Implementation typically takes 2-3 months\n• ROI becomes visible within first quarter\n• Best suited for ${selectedBusinessModel?.toLowerCase()} environments\n\nNext steps: Consider pilot program with core user segments.`,
-      deeper: `Let's dive deeper into ${currentQuery} from your ${selectedRole} perspective:\n\nAdvanced considerations:\n• Technical architecture requirements\n• Integration with existing ${selectedBusinessModel?.toLowerCase()} systems\n• Data privacy and compliance frameworks\n• Team training and change management\n• Performance monitoring and optimization\n\nSpecific to your ${selectedAiKnowledge.toLowerCase()} AI knowledge level, I recommend focusing on practical implementation strategies that align with your current capabilities.`,
-      examples: `Here are specific examples relevant to your ${selectedBusinessModel} context:\n\n1. Real-time product recommendations\n   - Increases conversion by 25-40%\n   - Works well with existing ${selectedRole} workflows\n\n2. Dynamic content personalization\n   - Reduces bounce rate by 30%\n   - Improves user engagement metrics\n\n3. Predictive customer journey mapping\n   - Optimizes touchpoint effectiveness\n   - Enhances ${selectedBusinessModel?.toLowerCase()} customer experience\n\nThese examples are specifically chosen based on your current AI knowledge level: ${selectedAiKnowledge.toLowerCase()}.`,
-      alternatives: `Alternative approaches for implementing AI personalization in ${selectedBusinessModel} environments:\n\n1. Gradual rollout strategy\n   - Start with single customer segment\n   - Measure impact before scaling\n   - Lower risk for ${selectedRole} teams\n\n2. Partner integration approach\n   - Leverage existing vendor relationships\n   - Faster time to market\n   - Reduced technical complexity\n\n3. Hybrid manual-AI system\n   - Maintains human oversight\n   - Builds confidence gradually\n   - Suitable for ${selectedAiKnowledge.toLowerCase()} teams\n\nEach approach has different implications for your organization's digital transformation journey.`
+      summarize: `Here's a concise summary tailored for the ${selectedIndustry} industry:\n\nKey takeaways:\n• AI personalization increases engagement by 300%\n• Implementation typically takes 2-3 months\n• ROI becomes visible within first quarter\n• Best suited for ${selectedIndustry} environments\n\nNext steps: Consider pilot program with core user segments.`,
+      translate: `Aquí está la respuesta traducida al español:\n\n**${currentQuery} - Perspectiva de la Industria ${selectedIndustry}**\n\nLa IA está revolucionando la búsqueda desde la coincidencia de palabras clave hasta la comprensión de la intención y el contexto del usuario. Los sistemas de búsqueda modernos anticipan necesidades, personalizan resultados y ofrecen experiencias conversacionales.\n\n**Perspectivas específicas de la industria:**\nPara la industria ${selectedIndustry}, la búsqueda inteligente transforma cómo los clientes descubren productos, acceden a información e interactúan con su ecosistema digital.\n\n**Áreas clave de implementación:**\n• Algoritmos de búsqueda basados en intención\n• Interfaces de búsqueda conversacional\n• Sugerencias de búsqueda predictiva\n• Clasificación de resultados consciente del contexto`,
+      expand: `Let's dive deeper into ${currentQuery} from your industry perspective:\n\n**Advanced Technical Considerations:**\n• Machine learning model selection and training\n• Real-time data processing architectures\n• Integration with existing ${selectedIndustry} systems\n• Data privacy and compliance frameworks\n• Performance monitoring and optimization\n\n**Implementation Strategy:**\n• Phase 1: Proof of concept with limited user group\n• Phase 2: Gradual rollout with A/B testing\n• Phase 3: Full deployment with continuous optimization\n\n**${selectedIndustry} Industry Specifics:**\nBased on your industry context, I recommend focusing on practical implementation strategies that align with regulatory requirements and existing technology infrastructure.`,
+      examples: `Here are specific examples relevant to the ${selectedIndustry} industry:\n\n**Example 1: Real-time Product Recommendations**\n- Increases conversion by 25-40%\n- Works well with existing industry workflows\n- Implementation timeline: 4-6 weeks\n\n**Example 2: Dynamic Content Personalization**\n- Reduces bounce rate by 30%\n- Improves user engagement metrics\n- ROI visible within first quarter\n\n**Example 3: Predictive Customer Journey Mapping**\n- Optimizes touchpoint effectiveness\n- Enhances ${selectedIndustry} customer experience\n- Enables proactive customer service\n\nThese examples are specifically chosen based on your ${selectedIndustry} industry context and proven success rates.`
     };
 
-    const response = actionResponses[action] || `Processing ${action} request for your ${selectedRole} context...`;
+    const response = actionResponses[action] || `Processing ${action} request for your ${selectedIndustry} context...`;
 
-    // Simulate streaming response
+    // Scroll to the main response area
+    setTimeout(() => {
+      const responseSection = document.querySelector('[data-main-response]');
+      if (responseSection) {
+        const elementTop = responseSection.getBoundingClientRect().top + window.pageYOffset;
+        const offsetTop = elementTop - 100; // Show some context above
+        window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+      }
+    }, 100);
+
+    // Simulate streaming response (50% faster)
     setStreamingContent("");
     let currentIndex = 0;
     const streamInterval = setInterval(() => {
@@ -169,9 +303,8 @@ The content has been personalized based on your selections and provides actionab
       } else {
         clearInterval(streamInterval);
         setIsStreaming(false);
-        setShowStreamActions(false); // Hide actions after completion
       }
-    }, 25);
+    }, 12); // Changed from 25ms to 12ms (roughly 50% faster)
   };
 
   const getPlaceholderText = () => {
@@ -207,80 +340,93 @@ The content has been personalized based on your selections and provides actionab
                   </p>
                 </div>
 
-                <div className="grid md:grid-cols-3 gap-6 mb-10">
-                  {/* Your Role */}
-                  <div className="bg-gray-50/50 rounded-2xl p-6 border border-gray-100">
-                    <label className="block text-sm font-semibold text-gray-900 mb-3 flex items-center">
-                      <div className="w-2 h-2 bg-purple-500 rounded-full mr-2" />
-                      Your role
-                    </label>
-                    <div className="space-y-2">
-                      {["Marketing", "Technology"].map((role) => (
-                        <label key={role} className="flex items-center cursor-pointer group">
-                          <input
-                            type="radio"
-                            name="role"
-                            value={role}
-                            checked={selectedRole === role}
-                            onChange={(e) => setSelectedRole(e.target.value)}
-                            className="w-4 h-4 text-purple-600 border-2 border-gray-300 focus:ring-purple-500 focus:ring-2 flex-shrink-0"
-                          />
-                          <span className="ml-3 text-sm text-gray-700 group-hover:text-gray-900 transition-colors font-medium">
-                            {role}
-                          </span>
-                        </label>
-                      ))}
+                <div className="flex flex-col md:flex-row gap-6 mb-10">
+                  {/* Your Role and Why You're Here - 35% width */}
+                  <div className="md:w-[35%] bg-gray-50/50 rounded-2xl p-4 border border-gray-100 opacity-60 space-y-6">
+                    {/* Your Role */}
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-900 mb-2 flex items-center">
+                        <div className="w-2 h-2 bg-purple-500 rounded-full mr-2" />
+                        Your role
+                        <span className="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
+                          Coming soon
+                        </span>
+                      </label>
+                      <div className="space-y-1">
+                        {["Marketing", "Technology"].map((role) => (
+                          <label key={role} className="flex items-center cursor-not-allowed group">
+                            <input
+                              type="radio"
+                              name="role"
+                              value={role}
+                              disabled
+                              className="w-4 h-4 text-purple-600 border-2 border-gray-300 focus:ring-purple-500 focus:ring-2 flex-shrink-0 opacity-50"
+                            />
+                            <span className="ml-3 text-sm text-gray-500 font-medium">
+                              {role}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Why You're Here */}
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-900 mb-2 flex items-center">
+                        <div className="w-2 h-2 bg-purple-500 rounded-full mr-2" />
+                        Why you are here
+                        <span className="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
+                          Coming soon
+                        </span>
+                      </label>
+                      <div className="space-y-1">
+                        {["Researching AI", "Researching Solution", "Sitecore Customer", "Other"].map((reason) => (
+                          <label key={reason} className="flex items-center cursor-not-allowed group">
+                            <input
+                              type="radio"
+                              name="whyHere"
+                              value={reason}
+                              disabled
+                              className="w-4 h-4 text-purple-600 border-2 border-gray-300 focus:ring-purple-500 focus:ring-2 flex-shrink-0 opacity-50"
+                            />
+                            <span className="ml-3 text-sm text-gray-500 font-medium">
+                              {reason}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
-                  {/* Your Business Model */}
-                  <div className="bg-gray-50/50 rounded-2xl p-6 border border-gray-100">
+                  {/* Your Industry - 65% width with Two Columns */}
+                  <div className="md:w-[65%] bg-gray-50/50 rounded-2xl p-4 border border-gray-100">
                     <label className="block text-sm font-semibold text-gray-900 mb-3 flex items-center">
                       <div className="w-2 h-2 bg-purple-500 rounded-full mr-2 flex-shrink-0" />
-                      Your business model
+                      Your industry
                     </label>
-                    <div className="space-y-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
                       {[
-                        "Business to consumer",
-                        "Business to business",
-                        "Business to citizen"
-                      ].map((businessModel) => (
-                        <label key={businessModel} className="flex items-start cursor-pointer group">
+                        "Financial Services",
+                        "Manufacturing",
+                        "Retail & Consumer Goods",
+                        "Healthcare",
+                        "Information Technology",
+                        "Professional Services",
+                        "Government",
+                        "Other B2C",
+                        "Other B2B"
+                      ].map((industry) => (
+                        <label key={industry} className="flex items-start cursor-pointer group">
                           <input
                             type="radio"
-                            name="businessModel"
-                            value={businessModel}
-                            checked={selectedBusinessModel === businessModel}
-                            onChange={(e) => setSelectedBusinessModel(e.target.value)}
+                            name="industry"
+                            value={industry}
+                            checked={selectedIndustry === industry}
+                            onChange={(e) => setSelectedIndustry(e.target.value)}
                             className="w-4 h-4 text-purple-600 border-2 border-gray-300 focus:ring-purple-500 focus:ring-2 flex-shrink-0 mt-0.5"
                           />
                           <span className="ml-3 text-sm text-gray-700 group-hover:text-gray-900 transition-colors font-medium leading-tight">
-                            {businessModel}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* AI Knowledge Level */}
-                  <div className="bg-gray-50/50 rounded-2xl p-6 border border-gray-100">
-                    <label className="block text-sm font-semibold text-gray-900 mb-3 flex items-center">
-                      <div className="w-2 h-2 bg-purple-500 rounded-full mr-2 flex-shrink-0" />
-                      <span className="leading-tight">Your level of AI knowledge</span>
-                    </label>
-                    <div className="space-y-2">
-                      {["Exploring", "Experimenting", "Applying Regularly"].map((level) => (
-                        <label key={level} className="flex items-center cursor-pointer group">
-                          <input
-                            type="radio"
-                            name="aiKnowledge"
-                            value={level}
-                            checked={selectedAiKnowledge === level}
-                            onChange={(e) => setSelectedAiKnowledge(e.target.value)}
-                            className="w-4 h-4 text-purple-600 border-2 border-gray-300 focus:ring-purple-500 focus:ring-2 flex-shrink-0"
-                          />
-                          <span className="ml-3 text-sm text-gray-700 group-hover:text-gray-900 transition-colors font-medium">
-                            {level}
+                            {industry}
                           </span>
                         </label>
                       ))}
@@ -295,27 +441,26 @@ The content has been personalized based on your selections and provides actionab
                         <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
                         <span className="text-black font-medium">
                           Great, you're set for{" "}
-                          <span className="font-semibold" style={{color: "#8042FF"}}>{selectedRole}</span> in{" "}
-                          <span className="font-semibold" style={{color: "#8042FF"}}>{selectedBusinessModel}</span> with{" "}
-                          <span className="font-semibold" style={{color: "#8042FF"}}>{selectedAiKnowledge.toLowerCase()}</span> AI knowledge.
+                          <span className="font-semibold" style={{color: "#8042FF"}}>{selectedIndustry}</span> industry.
                         </span>
                       </div>
-                      <button
-                        onClick={() => {
-                          setSelectedRole("");
-                          setSelectedBusinessModel("");
-                          setSelectedAiKnowledge("");
-                          setCurrentQuery("");
-                          setStreamingContent("");
-                        }}
-                        className="text-sm text-gray-500 hover:text-gray-700 underline transition-colors"
-                      >
-                        Reset selections
-                      </button>
+                      <div className="text-center">
+                        <button
+                          onClick={() => {
+                            setSelectedRole("");
+                            setSelectedIndustry("");
+                            setCurrentQuery("");
+                            setStreamingContent("");
+                          }}
+                          className="text-sm text-gray-500 hover:text-gray-700 underline transition-colors"
+                        >
+                          Reset selections
+                        </button>
+                      </div>
                     </div>
                   ) : (
                     <p className="text-gray-500 text-sm">
-                      Please select an option from each category to personalize your experience.
+                      Please select your industry to personalize your experience.
                     </p>
                   )}
                 </div>
@@ -334,15 +479,15 @@ The content has been personalized based on your selections and provides actionab
                     Choose a topic to explore
                   </h4>
                 </div>
-                <div className="flex flex-wrap gap-2 justify-center max-w-4xl mx-auto">
-                  {suggestedQuestions.slice(0, 7).map((question, index) => (
+                <div className="flex flex-wrap gap-3 justify-center max-w-4xl mx-auto">
+                  {hotTopics.map((topic, index) => (
                     <button
-                      key={`${question}-${index}`}
-                      onClick={() => handleTopicClick(question)}
-                      className="px-3 py-1.5 gradient-purple text-white hover:opacity-90 rounded-full text-xs font-medium transition-all hover:shadow-lg border-0 whitespace-nowrap hover:scale-105 transform"
+                      key={`${topic}-${index}`}
+                      onClick={() => handleTopicClick(topic)}
+                      className="px-4 py-2 gradient-purple text-white hover:opacity-90 rounded-full text-sm font-medium transition-all hover:shadow-lg border-0 whitespace-nowrap hover:scale-105 transform"
                       disabled={isStreaming}
                     >
-                      {question}
+                      {topic}
                     </button>
                   ))}
                 </div>
@@ -415,16 +560,16 @@ The content has been personalized based on your selections and provides actionab
                     </div>
                     <div className="space-y-2 text-xs mb-4">
                       <div className="flex items-center justify-between p-2 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border border-gray-200">
+                        <span className="font-medium text-gray-600">Industry:</span>
+                        <span className="text-purple-600 font-semibold text-right">{selectedIndustry}</span>
+                      </div>
+                      <div className="flex items-center justify-between p-2 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border border-gray-200">
                         <span className="font-medium text-gray-600">Role:</span>
-                        <span className="text-purple-600 font-semibold text-right">{selectedRole}</span>
+                        <span className="text-gray-400 font-semibold text-right">Not set</span>
                       </div>
                       <div className="flex items-center justify-between p-2 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border border-gray-200">
-                        <span className="font-medium text-gray-600">Business:</span>
-                        <span className="text-purple-600 font-semibold text-right">{selectedBusinessModel}</span>
-                      </div>
-                      <div className="flex items-center justify-between p-2 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border border-gray-200">
-                        <span className="font-medium text-gray-600">AI Level:</span>
-                        <span className="text-purple-600 font-semibold text-right">{selectedAiKnowledge}</span>
+                        <span className="font-medium text-gray-600">Why you are here:</span>
+                        <span className="text-gray-400 font-semibold text-right">Not set</span>
                       </div>
                     </div>
 
@@ -442,47 +587,73 @@ The content has been personalized based on your selections and provides actionab
                       </div>
                       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-3 border border-blue-100">
                         <div className="space-y-4 text-xs text-left">
+                          {/* Technology Lens */}
                           <div className="flex items-start gap-2">
                             <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-1.5 flex-shrink-0" />
                             <div className="text-left">
-                              <p className="text-gray-700 leading-snug mb-2">
-                                AI is transforming how {selectedBusinessModel?.toLowerCase() || 'businesses'} engage with customers through personalized experiences
+                              <p className="text-gray-700 leading-snug mb-2 font-medium">
+                                Technology Lens: AI-powered search and personalization engines
                               </p>
                               <div className="flex flex-wrap gap-1">
-                                <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs bg-blue-100 text-blue-800 border border-blue-200 hover:bg-blue-200 cursor-pointer transition-colors">
-                                  AI
+                                <span
+                                  className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs bg-blue-100 text-blue-800 border border-blue-200 hover:bg-blue-200 cursor-pointer transition-colors"
+                                  onClick={() => handleKeyConcept('Machine Learning')}
+                                >
+                                  Machine Learning
                                 </span>
-                                <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs bg-blue-100 text-blue-800 border border-blue-200 hover:bg-blue-200 cursor-pointer transition-colors">
-                                  personalized experiences
+                                <span
+                                  className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs bg-blue-100 text-blue-800 border border-blue-200 hover:bg-blue-200 cursor-pointer transition-colors"
+                                  onClick={() => handleKeyConcept('Real-time Processing')}
+                                >
+                                  Real-time Processing
                                 </span>
                               </div>
                             </div>
                           </div>
+
+                          {/* Experience Lens */}
                           <div className="flex items-start gap-2">
                             <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-1.5 flex-shrink-0" />
                             <div className="text-left">
-                              <p className="text-gray-700 leading-snug mb-2">
-                                {selectedRole} professionals are leading digital transformation initiatives in their organizations
+                              <p className="text-gray-700 leading-snug mb-2 font-medium">
+                                Experience Lens: Seamless, personalized customer journeys
                               </p>
                               <div className="flex flex-wrap gap-1">
-                                <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs bg-blue-100 text-blue-800 border border-blue-200 hover:bg-blue-200 cursor-pointer transition-colors">
-                                  digital transformation
+                                <span
+                                  className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs bg-blue-100 text-blue-800 border border-blue-200 hover:bg-blue-200 cursor-pointer transition-colors"
+                                  onClick={() => handleKeyConcept('User Intent')}
+                                >
+                                  User Intent
+                                </span>
+                                <span
+                                  className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs bg-blue-100 text-blue-800 border border-blue-200 hover:bg-blue-200 cursor-pointer transition-colors"
+                                  onClick={() => handleKeyConcept('Dynamic Content')}
+                                >
+                                  Dynamic Content
                                 </span>
                               </div>
                             </div>
                           </div>
+
+                          {/* Industry Lens */}
                           <div className="flex items-start gap-2">
                             <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-1.5 flex-shrink-0" />
                             <div className="text-left">
-                              <p className="text-gray-700 leading-snug mb-2">
-                                Stream AI enables real-time content adaptation based on user behavior and preferences
+                              <p className="text-gray-700 leading-snug mb-2 font-medium">
+                                Industry Lens: {selectedIndustry || 'Cross-industry'} transformation through AI
                               </p>
                               <div className="flex flex-wrap gap-1">
-                                <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs bg-blue-100 text-blue-800 border border-blue-200 hover:bg-blue-200 cursor-pointer transition-colors">
-                                  Stream AI
+                                <span
+                                  className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs bg-blue-100 text-blue-800 border border-blue-200 hover:bg-blue-200 cursor-pointer transition-colors"
+                                  onClick={() => handleKeyConcept('Digital Innovation')}
+                                >
+                                  Digital Innovation
                                 </span>
-                                <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs bg-blue-100 text-blue-800 border border-blue-200 hover:bg-blue-200 cursor-pointer transition-colors">
-                                  real-time content adaptation
+                                <span
+                                  className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs bg-blue-100 text-blue-800 border border-blue-200 hover:bg-blue-200 cursor-pointer transition-colors"
+                                  onClick={() => handleKeyConcept('Competitive Advantage')}
+                                >
+                                  Competitive Advantage
                                 </span>
                               </div>
                             </div>
@@ -509,7 +680,7 @@ The content has been personalized based on your selections and provides actionab
 
                 {/* Main Panel - Enhanced with Better Typography */}
                 <div className="lg:col-span-2">
-                  <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
+                  <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-lg hover:shadow-xl transition-shadow duration-300" data-main-response>
 
                     <div className="flex items-center justify-between mb-8">
                       <div className="flex items-center gap-3">
@@ -531,10 +702,79 @@ The content has been personalized based on your selections and provides actionab
                     </div>
 
                     <div className="max-w-none">
-                      <div className="whitespace-pre-wrap text-gray-800 leading-7 text-base text-left bg-gradient-to-br from-gray-50 to-white p-6 rounded-xl border border-gray-200">
+                      <div className="relative whitespace-pre-wrap text-gray-800 leading-7 text-base text-left bg-gradient-to-br from-gray-50 to-white p-6 rounded-xl border border-gray-200">
                         {streamingContent}
                         {isStreaming && (
                           <span className="inline-block w-2 h-5 bg-purple-600 animate-pulse ml-1 rounded" />
+                        )}
+
+                        {/* Hovering Adjust with Stream AI button - positioned over end of response */}
+                        {!isStreaming && streamingContent && (
+                          <div className="absolute bottom-4 right-4">
+                            <div className="relative" ref={streamActionsRef}>
+                              <button
+                                onClick={() => setShowStreamActions(!showStreamActions)}
+                                className="gradient-purple text-white px-3 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center space-x-2 transform hover:scale-105 text-xs font-medium opacity-90 hover:opacity-100"
+                              >
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                                <span>Adjust with Stream AI</span>
+                                <svg
+                                  className={`w-2 h-2 transition-transform duration-300 ${showStreamActions ? 'rotate-180' : ''}`}
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                              </button>
+
+                              {/* Stream Actions Dropdown */}
+                              {showStreamActions && (
+                                <div className="absolute bottom-full right-0 mb-2 bg-white rounded-xl shadow-xl border border-gray-200 p-3 min-w-[200px] z-50">
+                                  <div className="space-y-2">
+                                    <button
+                                      onClick={() => handleStreamAction('summarize')}
+                                      className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 rounded-lg transition-colors flex items-center gap-2"
+                                    >
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                      </svg>
+                                      Summarize
+                                    </button>
+                                    <button
+                                      onClick={() => handleStreamAction('translate')}
+                                      className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 rounded-lg transition-colors flex items-center gap-2"
+                                    >
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                                      </svg>
+                                      Translate to Spanish
+                                    </button>
+                                    <button
+                                      onClick={() => handleStreamAction('expand')}
+                                      className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 rounded-lg transition-colors flex items-center gap-2"
+                                    >
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                                      </svg>
+                                      Expand details
+                                    </button>
+                                    <button
+                                      onClick={() => handleStreamAction('examples')}
+                                      className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 rounded-lg transition-colors flex items-center gap-2"
+                                    >
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                      </svg>
+                                      Show examples
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
                         )}
 
                         {/* Content Type Links - Only show when response is complete */}
@@ -553,7 +793,7 @@ The content has been personalized based on your selections and provides actionab
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
-                                Article
+                                Read
                               </button>
                               <button
                                 onClick={() => handleContentTypeToggle('video')}
@@ -566,7 +806,7 @@ The content has been personalized based on your selections and provides actionab
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293H15a2 2 0 002-2V9a2 2 0 00-2-2h-1.172a1 1 0 01-.707-.293L10.707 4.293A1 1 0 0010 4H9a2 2 0 00-2 2v5zm0 0V9a2 2 0 012-2h1.172a1 1 0 00.707-.293L12.586 5.293A1 1 0 0113 5h2a2 2 0 012 2v6a2 2 0 01-2 2h-2a1 1 0 01-.707-.293L9.879 12.293A1 1 0 019 12v-2z" />
                                 </svg>
-                                Video
+                                Watch
                               </button>
                               <button
                                 onClick={() => handleContentTypeToggle('podcast')}
@@ -579,7 +819,7 @@ The content has been personalized based on your selections and provides actionab
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z" />
                                 </svg>
-                                Podcast
+                                Listen
                               </button>
                             </div>
 
@@ -599,18 +839,38 @@ The content has been personalized based on your selections and provides actionab
                                   </div>
 
                                   {/* Content Title and Meta */}
-                                  <div>
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                                      {inlineContent ? inlineContent.data.title : 'The Future of AI Personalization'}
-                                    </h3>
-                                    <p className="text-sm text-gray-600 mb-2">
-                                      {inlineContent ? inlineContent.data.description : `Tailored for ${selectedRole} professionals in ${selectedBusinessModel} environments`}
-                                    </p>
-                                    <div className="flex items-center gap-4 text-xs text-gray-500">
-                                      <span>Personalized for {selectedRole} • {selectedBusinessModel}</span>
-                                      <span>•</span>
-                                      <span>{inlineContent ? inlineContent.data.duration : '8 min read'}</span>
+                                  <div className="flex justify-between items-start">
+                                    <div className="flex-1">
+                                      <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                                        {inlineContent ? inlineContent.data.title : 'The Future of AI Personalization'}
+                                      </h3>
+                                      <p className="text-sm text-gray-600 mb-2">
+                                        {inlineContent ? inlineContent.data.description : `Comprehensive coverage of the topic`}
+                                      </p>
+                                      <div className="flex items-center gap-4 text-xs text-gray-500">
+                                        <span>{inlineContent ? inlineContent.data.duration : '8 min read'}</span>
+                                      </div>
                                     </div>
+
+                                    {/* Expand Button */}
+                                    <button
+                                      onClick={() => {
+                                        // Scroll to show the full-width content with header visible
+                                        const fullWidthContent = document.querySelector('[data-full-content]');
+                                        if (fullWidthContent) {
+                                          const elementTop = fullWidthContent.getBoundingClientRect().top + window.pageYOffset;
+                                          // Offset by 100px to show the header and "Back to Response" button
+                                          const offsetTop = elementTop - 100;
+                                          window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+                                        }
+                                      }}
+                                      className="ml-4 px-3 py-1.5 text-xs font-medium text-purple-600 hover:text-purple-700 hover:bg-purple-50 rounded-lg transition-colors flex items-center gap-1"
+                                    >
+                                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                                      </svg>
+                                      Expand
+                                    </button>
                                   </div>
                                 </div>
 
@@ -619,7 +879,7 @@ The content has been personalized based on your selections and provides actionab
                                   {/* Video/Podcast Player Area */}
                                   {inlineContent && (inlineContent.type === 'video' || inlineContent.type === 'podcast') && (
                                     <div className="mb-6">
-                                      <div className="aspect-video bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg flex items-center justify-center border border-purple-200 mb-4">
+                                      <div className="aspect-video bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg flex items-center justify-center border border-purple-200">
                                         <div className="text-center">
                                           <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-3 hover:bg-purple-700 transition-colors cursor-pointer">
                                             {inlineContent.type === 'video' ? (
@@ -637,42 +897,86 @@ The content has been personalized based on your selections and provides actionab
                                           </p>
                                         </div>
                                       </div>
-
-                                      {/* Video/Podcast Description - Full Content */}
-                                      <div className="text-sm text-gray-700 leading-relaxed text-left">
-                                        {inlineContent.data.content}
-                                      </div>
                                     </div>
                                   )}
 
                                   {/* Article Content Preview */}
-                                  <div className="text-sm text-gray-700 leading-relaxed text-left">
-                                    {inlineContent ?
-                                      inlineContent.data.content.split('\n\n')[0] + '...' :
-                                      `This article explores how AI is transforming business experiences with insights for your role...`
-                                    }
+                                  {/* Article Content Preview - Only show for articles */}
+                                  {(!inlineContent || inlineContent.type === 'article') && (
+                                    <div className="text-sm text-gray-700 leading-relaxed text-left">
+                                    {showFullArticle ? (
+                                      <div className="whitespace-pre-line">
+                                        {inlineContent ? inlineContent.data.content : `This article explores the latest developments and practical applications...
 
-                                    <div className="mt-4 flex gap-3">
-                                      <button
-                                        onClick={() => setIsContentExpanded(true)}
-                                        className="gradient-purple text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
-                                      >
-                                        Show Full Content
-                                      </button>
-                                      <button
-                                        onClick={closeInlineContent}
-                                        className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-all text-sm font-medium"
-                                      >
-                                        Close
-                                      </button>
+**What You'll Learn:**
+• Technology foundations and implementation strategies
+• Industry use cases and applications
+• Best practices and methodologies
+• Real-world examples and case studies
+• Step-by-step implementation roadmap
+
+**Key Insights:**
+This content addresses the core concepts and practical applications, providing actionable strategies you can implement.
+
+**Format-Specific Value:**
+In-depth analysis with visual frameworks and downloadable resources
+
+*This is placeholder content demonstrating the structured approach to topic-specific materials.*`}
+                                      </div>
+                                    ) : (
+                                      inlineContent ?
+                                        inlineContent.data.content.split('\n\n')[0] + '...' :
+                                        `This article explores the latest developments and practical applications...`
+                                    )}
+
+                                    {!showFullArticle && (
+                                      <div className="mt-4">
+                                        <button
+                                          onClick={() => setShowFullArticle(true)}
+                                          className="gradient-purple text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
+                                        >
+                                          Continue reading
+                                        </button>
+                                      </div>
+                                    )}
                                     </div>
-                                  </div>
+                                  )}
                                 </div>
                               </div>
                           </div>
                         )}
                       </div>
                     </div>
+
+                    {/* Conversation Bubbles - Show concept queries */}
+                    {conversationBubbles.length > 0 && (
+                      <div className="mt-8 space-y-4" data-concept-deep-dive>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                          <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                          </svg>
+                          Concept Deep Dive
+                        </h3>
+
+                        {conversationBubbles.map((bubble, index) => (
+                          <div key={index} className="space-y-3">
+                            {/* User query bubble */}
+                            <div className="flex justify-end">
+                              <div className="bg-purple-600 text-white px-4 py-2 rounded-2xl rounded-br-md max-w-xs">
+                                <p className="text-sm font-medium">{bubble.query}</p>
+                              </div>
+                            </div>
+
+                            {/* AI response bubble */}
+                            <div className="flex justify-start">
+                              <div className="bg-gray-100 text-gray-800 px-4 py-3 rounded-2xl rounded-bl-md max-w-2xl">
+                                <p className="text-sm leading-relaxed text-left">{bubble.response}</p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
 
                     {/* Rich Multimedia Content Section - Only show when response is complete */}
                     {!isStreaming && streamingContent && (
@@ -691,27 +995,8 @@ The content has been personalized based on your selections and provides actionab
 
                     {!isStreaming && streamingContent && (
                       <div className="mt-8 pt-6 border-t border-gray-200">
-                        {/* Stream AI Adjust Button - Left justified with expandable actions */}
+                        {/* Expandable Stream AI Actions - positioned when hovering button is clicked */}
                         <div className="mb-6">
-                          <div className="flex justify-start">
-                            <button
-                              onClick={() => setShowStreamActions(!showStreamActions)}
-                              className="gradient-purple text-white px-4 py-2 rounded-full shadow-md hover:shadow-lg transition-all duration-300 flex items-center space-x-2 transform hover:scale-105 text-sm font-medium"
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                              </svg>
-                              <span>Adjust with Stream AI</span>
-                              <svg
-                                className={`w-3 h-3 transition-transform duration-300 ${showStreamActions ? 'rotate-180' : ''}`}
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                              </svg>
-                            </button>
-                          </div>
                           {/* ... rest of the file unchanged ... */}
                         </div>
                         {/* ... */}
@@ -727,7 +1012,7 @@ The content has been personalized based on your selections and provides actionab
 
       {/* Inline Content Component */}
       {inlineContent && (
-        <div className="max-w-7xl mx-auto mt-8">
+        <div className="max-w-7xl mx-auto mt-8" data-full-content>
           <div className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden">
             {/* Header with close button */}
             <div className="px-8 py-6 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
@@ -788,7 +1073,7 @@ The content has been personalized based on your selections and provides actionab
                 </p>
 
                 <div className="flex items-center justify-center gap-4 text-sm text-gray-500">
-                  <span>Personalized for {selectedRole} • {selectedBusinessModel}</span>
+                  <span>{inlineContent?.data.duration}</span>
                   <span>•</span>
                   <span>{inlineContent.data.duration}</span>
                 </div>
@@ -833,7 +1118,7 @@ The content has been personalized based on your selections and provides actionab
                 {/* Call to Action */}
                 <div className="mt-8 p-6 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-200">
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">Ready to implement these insights?</h3>
-                  <p className="text-gray-600 mb-4">Get personalized recommendations based on your {selectedRole} role and {selectedBusinessModel} context.</p>
+                  <p className="text-gray-600 mb-4">Get personalized recommendations based on your {selectedIndustry} industry context.</p>
                   <div className="flex flex-wrap gap-3">
                     <button className="gradient-purple text-white px-6 py-3 rounded-full shadow-md hover:shadow-lg transition-all duration-300 flex items-center space-x-2 transform hover:scale-105 text-sm font-medium">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
