@@ -193,7 +193,7 @@ ${content.enablingUseCases ? content.enablingUseCases.map(point => `• ${point}
   };
 
   const handleContentTypeToggle = (newType: string) => {
-    const mockContent = generateMockContent(newType, 'default');
+    const mockContent = generateMockContent(newType, currentQuery || 'Future of Search');
     setInlineContent({ type: newType, data: mockContent });
     setActiveContentLocation('default');
     setIsContentExpanded(false); // Reset expansion state when switching types
@@ -929,7 +929,7 @@ ${type === 'article' ? 'In-depth analysis with visual frameworks and downloadabl
                                   <div className="flex justify-between items-start">
                                     <div className="flex-1">
                                       <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                                        {inlineContent ? inlineContent.data.title : 'The Future of AI Personalization'}
+                                        {inlineContent ? inlineContent.data.title : currentQuery || 'Future of Search'}
                                       </h3>
                                       <p className="text-sm text-gray-600 mb-2">
                                         {inlineContent ? inlineContent.data.description : `Sitecore's take on this hot topic`}
@@ -966,24 +966,38 @@ ${type === 'article' ? 'In-depth analysis with visual frameworks and downloadabl
                                   {/* Video/Podcast Player Area */}
                                   {inlineContent && (inlineContent.type === 'video' || inlineContent.type === 'podcast') && (
                                     <div className="mb-6">
-                                      <div className="aspect-video bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg flex items-center justify-center border border-purple-200">
-                                        <div className="text-center">
-                                          <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-3 hover:bg-purple-700 transition-colors cursor-pointer">
-                                            {inlineContent.type === 'video' ? (
-                                              <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                                <path d="M8 5v14l11-7z"/>
-                                              </svg>
-                                            ) : (
-                                              <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                                <path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
-                                              </svg>
-                                            )}
-                                          </div>
-                                          <p className="text-sm text-gray-600 font-medium">
-                                            {inlineContent.type === 'video' ? 'Video Player' : 'Podcast Player'}
-                                          </p>
+                                      {inlineContent.type === 'video' && (currentQuery === 'Future of Search' || inlineContent.data.title === 'Future of Search') ? (
+                                        <div className="aspect-video rounded-lg overflow-hidden border border-purple-200">
+                                          <iframe
+                                            src="https://share.synthesia.io/embeds/videos/46319d23-841d-4467-97fd-5af6d9cb053c"
+                                            loading="lazy"
+                                            title="Synthesia video player - Future Search"
+                                            allowFullScreen
+                                            allow="encrypted-media; fullscreen;"
+                                            className="w-full h-full"
+                                            style={{ border: 'none', padding: 0, margin: 0 }}
+                                          />
                                         </div>
-                                      </div>
+                                      ) : (
+                                        <div className="aspect-video bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg flex items-center justify-center border border-purple-200">
+                                          <div className="text-center">
+                                            <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-3 hover:bg-purple-700 transition-colors cursor-pointer">
+                                              {inlineContent.type === 'video' ? (
+                                                <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                                  <path d="M8 5v14l11-7z"/>
+                                                </svg>
+                                              ) : (
+                                                <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                                  <path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+                                                </svg>
+                                              )}
+                                            </div>
+                                            <p className="text-sm text-gray-600 font-medium">
+                                              {inlineContent.type === 'video' ? 'Video Player' : 'Podcast Player'}
+                                            </p>
+                                          </div>
+                                        </div>
+                                      )}
                                     </div>
                                   )}
 
@@ -1172,25 +1186,39 @@ In-depth analysis with visual frameworks and downloadable resources
               {/* Video/Podcast Player Area */}
               {(inlineContent.type === 'video' || inlineContent.type === 'podcast') && (
                 <div className="mb-8">
-                  <div className="aspect-video bg-gradient-to-br from-purple-100 to-pink-100 rounded-xl flex items-center justify-center border border-purple-200">
-                    <div className="text-center">
-                      <div className="w-20 h-20 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 hover:bg-purple-700 transition-colors cursor-pointer">
-                        {inlineContent.type === 'video' ? (
-                          <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M8 5v14l11-7z"/>
-                          </svg>
-                        ) : (
-                          <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
-                          </svg>
-                        )}
-                      </div>
-                      <p className="text-gray-600 font-medium">
-                        {inlineContent.type === 'video' ? 'Video Player' : 'Podcast Player'}
-                      </p>
-                      <p className="text-sm text-gray-500 mt-1">Duration: {inlineContent.data.duration}</p>
+                  {inlineContent.type === 'video' && (currentQuery === 'Future of Search' || inlineContent.data.title === 'Future of Search') ? (
+                    <div className="aspect-video rounded-xl overflow-hidden border border-purple-200">
+                      <iframe
+                        src="https://share.synthesia.io/embeds/videos/46319d23-841d-4467-97fd-5af6d9cb053c"
+                        loading="lazy"
+                        title="Synthesia video player - Future Search"
+                        allowFullScreen
+                        allow="encrypted-media; fullscreen;"
+                        className="w-full h-full"
+                        style={{ border: 'none', padding: 0, margin: 0 }}
+                      />
                     </div>
-                  </div>
+                  ) : (
+                    <div className="aspect-video bg-gradient-to-br from-purple-100 to-pink-100 rounded-xl flex items-center justify-center border border-purple-200">
+                      <div className="text-center">
+                        <div className="w-20 h-20 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 hover:bg-purple-700 transition-colors cursor-pointer">
+                          {inlineContent.type === 'video' ? (
+                            <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M8 5v14l11-7z"/>
+                            </svg>
+                          ) : (
+                            <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+                            </svg>
+                          )}
+                        </div>
+                        <p className="text-gray-600 font-medium">
+                          {inlineContent.type === 'video' ? 'Video Player' : 'Podcast Player'}
+                        </p>
+                        <p className="text-sm text-gray-500 mt-1">Duration: {inlineContent.data.duration}</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
