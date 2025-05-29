@@ -115,22 +115,28 @@ export default function Callout() {
         },
         "Personalization at AI Scale": {
           summary: `Scale personalization beyond basic demographics to real-time behavioral adaptation, creating unique experiences for every user interaction while maintaining privacy and performance.`,
-          industryLens: `In ${industry}, AI-scale personalization means delivering relevant content, products, and experiences to each customer automatically, driving engagement and business outcomes through intelligent automation.`,
-          keyPoints: [
+          industryLens: industryLenses[industry as keyof typeof industryLenses] || industryLenses["Other B2B"],
+          businessImpact: [
             "Real-time behavioral analysis",
             "Dynamic content adaptation",
-            "Privacy-first personalization",
-            "Cross-channel consistency"
+            "Privacy-first personalization"
+          ],
+          enablingUseCases: [
+            "Cross-channel consistency",
+            "Automated personalization workflows"
           ]
         },
         "Generative Experiences": {
           summary: `Move beyond static content to dynamic, AI-generated experiences that adapt in real-time based on user needs, preferences, and context, creating truly unique digital interactions.`,
-          industryLens: `For ${industry} organizations, generative experiences mean content, interfaces, and workflows that automatically adapt to each user's specific needs and context, improving efficiency and satisfaction.`,
-          keyPoints: [
+          industryLens: industryLenses[industry as keyof typeof industryLenses] || industryLenses["Other B2B"],
+          businessImpact: [
             "Dynamic content generation",
             "Adaptive user interfaces",
-            "Contextual experience flows",
-            "Intelligent content optimization"
+            "Contextual experience flows"
+          ],
+          enablingUseCases: [
+            "Intelligent content optimization",
+            "Real-time experience adaptation"
           ]
         }
       };
@@ -148,7 +154,7 @@ Business Impact
 ${content.businessImpact ? content.businessImpact.map(point => `• ${point}`).join('\n') : '• Enhanced operational efficiency and user experience'}
 
 Enabling Use Cases
-${content.enablingUseCases ? content.enablingUseCases.map(point => `• ${point}`).join('\n') : content.keyPoints ? content.keyPoints.map(point => `• ${point}`).join('\n') : '• Improved user engagement and satisfaction'}`;
+${content.enablingUseCases ? content.enablingUseCases.map(point => `• ${point}`).join('\n') : '• Improved user engagement and satisfaction'}`;
     };
 
     const response = getTopicResponse(question, selectedIndustry || 'Cross-industry');
