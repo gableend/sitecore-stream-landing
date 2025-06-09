@@ -186,3 +186,14 @@ html {
 .header-link:hover::after {
   width: 80%;
 }
+
+/* Role themes */
+.theme-marketer {
+  background-color: #faf5ff;
+}
+.theme-technologist {
+  background-color: #f0f9ff;
+}
+.theme-executive {
+  background-color: #f5f7fa;
+}
