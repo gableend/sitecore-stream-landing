@@ -8,7 +8,7 @@ import {
   Mail,
   Phone,
   Users,
-  Zap
+  Zap,
 } from "lucide-react";
 
 export default function CTA() {
@@ -19,7 +19,7 @@ export default function CTA() {
       description: "Contact us",
       action: "Contact us",
       variant: "default" as const,
-      href: "#contact"
+      href: "#contact",
     },
     {
       icon: Calendar,
@@ -27,7 +27,7 @@ export default function CTA() {
       description: "Explore Webinars",
       action: "View events",
       variant: "outline" as const,
-      href: "#webinars"
+      href: "#webinars",
     },
     {
       icon: HeadphonesIcon,
@@ -35,8 +35,8 @@ export default function CTA() {
       description: "Access Support portal",
       action: "Get help",
       variant: "outline" as const,
-      href: "#support"
-    }
+      href: "#support",
+    },
   ];
 
   return (
@@ -45,7 +45,7 @@ export default function CTA() {
         {/* Main CTA */}
         <div className="text-center mb-20">
           <Card className="border-0 bg-gradient-purple text-white overflow-hidden relative">
-            <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
+            <div className="absolute inset-0 bg-grid-pattern opacity-10" />
             <CardContent className="relative p-12 lg:p-20">
               <div className="max-w-3xl mx-auto space-y-8">
                 <div className="space-y-6">
@@ -53,17 +53,25 @@ export default function CTA() {
                     Get started with a demo
                   </h2>
                   <p className="text-xl text-white/90 max-w-2xl mx-auto">
-                    Take the first step to achieving your digital experience goals.
-                    Let us show you how Sitecore can help your brand deliver exceptional experiences.
+                    Take the first step to achieving your digital experience
+                    goals. Let us show you how Sitecore can help your brand
+                    deliver exceptional experiences.
                   </p>
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button size="lg" className="bg-white text-sitecore-purple hover:bg-white/90">
+                  <Button
+                    size="lg"
+                    className="bg-white text-sitecore-purple hover:bg-white/90"
+                  >
                     Request a demo
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
-                  <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-sitecore-purple">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="border-white text-white hover:bg-white hover:text-sitecore-purple"
+                  >
                     <Phone className="mr-2 h-4 w-4" />
                     Schedule a call
                   </Button>
@@ -81,7 +89,9 @@ export default function CTA() {
                       <div className="inline-flex items-center justify-center w-12 h-12 bg-white/20 rounded-full mb-3">
                         <Zap className="h-6 w-6" />
                       </div>
-                      <p className="text-sm text-white/80">AI-Powered Platform</p>
+                      <p className="text-sm text-white/80">
+                        AI-Powered Platform
+                      </p>
                     </div>
                     <div>
                       <div className="inline-flex items-center justify-center w-12 h-12 bg-white/20 rounded-full mb-3">
@@ -98,26 +108,25 @@ export default function CTA() {
 
         {/* Secondary CTAs */}
         <div className="grid md:grid-cols-3 gap-8">
-          {ctaOptions.map((option, index) => (
-            <Card key={index} className="group hover:shadow-lg transition-all duration-300 cursor-pointer">
+          {ctaOptions.map((option) => (
+            <Card
+              key={option.title}
+              className="group hover:shadow-lg transition-all duration-300 cursor-pointer"
+            >
               <CardContent className="p-8 text-center">
                 <div className="mb-6">
                   <div className="inline-flex items-center justify-center w-16 h-16 bg-sitecore-purple/10 rounded-2xl mb-4 group-hover:bg-sitecore-purple/20 transition-colors">
                     <option.icon className="h-8 w-8 text-sitecore-purple" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">
-                    {option.title}
-                  </h3>
-                  <p className="text-muted-foreground">
-                    {option.description}
-                  </p>
+                  <h3 className="text-xl font-semibold mb-2">{option.title}</h3>
+                  <p className="text-muted-foreground">{option.description}</p>
                 </div>
                 <Button
                   variant={option.variant}
                   className={`w-full ${
-                    option.variant === 'default'
-                      ? 'bg-sitecore-purple hover:bg-sitecore-purple/90 text-white'
-                      : 'border-sitecore-purple text-sitecore-purple hover:bg-sitecore-purple hover:text-white'
+                    option.variant === "default"
+                      ? "bg-sitecore-purple hover:bg-sitecore-purple/90 text-white"
+                      : "border-sitecore-purple text-sitecore-purple hover:bg-sitecore-purple hover:text-white"
                   }`}
                 >
                   {option.action}
@@ -138,12 +147,18 @@ export default function CTA() {
                   <div className="h-12 w-24 bg-muted rounded flex items-center justify-center mx-auto mb-4">
                     <span className="text-xs font-bold">GARTNER</span>
                   </div>
-                  <h4 className="font-semibold mb-2">2025 Gartner Magic Quadrant</h4>
+                  <h4 className="font-semibold mb-2">
+                    2025 Gartner Magic Quadrant
+                  </h4>
                   <p className="text-sm text-muted-foreground mb-4">
                     for Digital Asset Management Platforms
                   </p>
                 </div>
-                <Button variant="outline" size="sm" className="border-sitecore-purple text-sitecore-purple hover:bg-sitecore-purple hover:text-white">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-sitecore-purple text-sitecore-purple hover:bg-sitecore-purple hover:text-white"
+                >
                   See Gartner report
                   <ArrowRight className="ml-2 h-3 w-3" />
                 </Button>
@@ -156,12 +171,18 @@ export default function CTA() {
                   <div className="h-12 w-24 bg-muted rounded flex items-center justify-center mx-auto mb-4">
                     <span className="text-xs font-bold">GARTNER</span>
                   </div>
-                  <h4 className="font-semibold mb-2">2025 Gartner Magic Quadrant</h4>
+                  <h4 className="font-semibold mb-2">
+                    2025 Gartner Magic Quadrant
+                  </h4>
                   <p className="text-sm text-muted-foreground mb-4">
                     for Digital Experience Platforms
                   </p>
                 </div>
-                <Button variant="outline" size="sm" className="border-sitecore-purple text-sitecore-purple hover:bg-sitecore-purple hover:text-white">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-sitecore-purple text-sitecore-purple hover:bg-sitecore-purple hover:text-white"
+                >
                   See Gartner report
                   <ArrowRight className="ml-2 h-3 w-3" />
                 </Button>
@@ -179,7 +200,11 @@ export default function CTA() {
                     Worldwide Hybrid Headless CMS 2023
                   </p>
                 </div>
-                <Button variant="outline" size="sm" className="border-sitecore-purple text-sitecore-purple hover:bg-sitecore-purple hover:text-white">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-sitecore-purple text-sitecore-purple hover:bg-sitecore-purple hover:text-white"
+                >
                   See IDC report
                   <ArrowRight className="ml-2 h-3 w-3" />
                 </Button>

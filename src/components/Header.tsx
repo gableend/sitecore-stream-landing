@@ -3,10 +3,13 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useContext } from "react";
+import UserContext from "@/context/UserContext";
 import { Menu, X, ChevronDown, ArrowRight } from "lucide-react";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { reset } = useContext(UserContext);
 
   const navigation = [
     {
@@ -16,7 +19,7 @@ export default function Header() {
         { name: "Why Sitecore", href: "#why-sitecore" },
         { name: "Case Studies", href: "#case-studies" },
         { name: "Customer Awards", href: "#awards" },
-      ]
+      ],
     },
     {
       name: "Products & Services",
@@ -25,7 +28,7 @@ export default function Header() {
         { name: "XM Cloud", href: "#xm-cloud" },
         { name: "Personalize", href: "#personalize" },
         { name: "Content Hub", href: "#content-hub" },
-      ]
+      ],
     },
     {
       name: "Partners",
@@ -64,6 +67,9 @@ export default function Header() {
             <Link href="/join-conversation" className="header-link">
               Join the conversation
             </Link>
+            <button onClick={reset} className="header-link">
+              Reset Experience
+            </button>
           </nav>
 
           {/* CTA Button */}
@@ -109,6 +115,15 @@ export default function Header() {
                 >
                   Join the conversation
                 </Link>
+                <button
+                  className="block py-2 header-link"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    reset();
+                  }}
+                >
+                  Reset Experience
+                </button>
               </div>
               <Button className="w-full bg-sitecore-ultra-violet hover:bg-sitecore-ultra-violet/90 text-white rounded-full">
                 Visit Sitecore.com
